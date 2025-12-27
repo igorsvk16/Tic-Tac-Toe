@@ -6,12 +6,17 @@ const Gameboard = (() => {
     }
 
     function setMark(index, mark) {
-        return 
+        if (board[index] === null && index >= 0 && index <= 8) {
+            return board[index] = mark;
+        }
+         
     }
 
-    function reset() {}
+    function getBoard() {}
 
-    return { getBoard, setMark, reset }
+    
+
+    return { getBoard, setMark }
 })();
 
 function Player(name, mark) {
@@ -19,5 +24,26 @@ function Player(name, mark) {
 }
 
 function GameController() {
+    const players = [Player('Player 1', 'X'), Player('Player 2', 'O')];
+    let currentPlayerIndex = 0;
+    let gameOver = false;
+
+    function getActivePlayer() {
+        return players[currentPlayerIndex];
+    }
+
+    function resetGame() {
+        for (let i = 0; i < board.length; i++) {
+            board[i] = null;
+        }
+    }
+
+    function playRound(index) {
+
+    }
+    
+    function checkDraw(board) {
+
+    }
 
 }
