@@ -18,6 +18,7 @@ const Gameboard = (() => {
         }
     }
 
+
     return { getBoard, setMark, reset }
 })();
 
@@ -116,4 +117,28 @@ function GameController() {
     return { getActivePlayer, playRound, resetGame }
 }
 
+const DisplayController = (() => {
+    let statusEl = document.querySelector('#status');
+    let resetBtn = document.querySelector('#reset');
+    const boardEl = document.querySelector("#board");
+    function render() {
+        const board = Gameboard.getBoard();
+        boardEl.textContent = '';
+        board.forEach((value, index) => {
+            const cellBtn = document.createElement("button")
+            if (value === null) {
+                cellBtn.textContent = "";
+            } else {
+                cellBtn.textContent = value;
+            }
+            cellBtn.dataset.index = index;
+            boardEl.append(cellBtn);
+        }) 
+    }
+    return { render, bindEvents } }) ();
+
+
+
+
 const game = GameController();
+const ui = DisplayController(game);
