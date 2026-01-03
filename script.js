@@ -109,6 +109,7 @@ function GameController() {
     }
 
     function resetGame() {
+        resetBtn.addEventListener("click", button);
         Gameboard.reset();
         currentPlayerIndex = 0;
         gameOver = false;
@@ -135,10 +136,18 @@ const DisplayController = (() => {
             boardEl.append(cellBtn);
         }) 
     }
+    function bindEvents() {
+        boardEl.addEventListener("click", button);
+        if (e.target.tagName !== 'BUTTON') return
+        index = Number(e.target.dataset.index);
+        game.playRound(index);
+        render();
+    }
     return { render, bindEvents } }) ();
 
 
 
 
 const game = GameController();
-const ui = DisplayController(game);
+DisplayController.render();
+DisplayController.bindEvents(game);
