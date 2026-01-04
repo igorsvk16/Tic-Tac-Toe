@@ -49,7 +49,7 @@ function GameController() {
 
         if (!placed) {
             console.log(`Invalid move`);
-            return;
+            return { type: "invalid"};
         }
         const board = Gameboard.getBoard();
         printBoard(board);
@@ -57,16 +57,16 @@ function GameController() {
         if (winnerMark) {
             gameOver = true;
             console.log(`${player.name} with mark ${winnerMark} wins!`);
-            return;
+            return { type: `${player.name} WIN!!!`};
         }
         const isDraw = checkDraw(board);
         if (isDraw === true) {
             console.log('The game is a draw!');
-            return;
+            return { type: "Draw!"};
         }
-
         switchPlayer();
         console.log(`It's now ${getActivePlayer().name}'s turn.`);
+        return { type: `Turn ${getActivePlayer().name}.` }
     }
 
     const WIN_LINES = [
@@ -81,7 +81,6 @@ function GameController() {
         ]
 
     function checkWinner(board) {
-        
         for (const line of WIN_LINES) {
             const [a, b, c] = line;
             if (board[a] !== null && board[a] === board[b] && board[a] === board[c]) {
@@ -109,7 +108,6 @@ function GameController() {
     }
 
     function resetGame() {
-        resetBtn.addEventListener("click", button);
         Gameboard.reset();
         currentPlayerIndex = 0;
         gameOver = false;
@@ -119,6 +117,7 @@ function GameController() {
 }
 
 const DisplayController = (() => {
+    let lastResult = game.playRound(index);
     let statusEl = document.querySelector('#status');
     let resetBtn = document.querySelector('#reset');
     const boardEl = document.querySelector("#board");
@@ -135,18 +134,21 @@ const DisplayController = (() => {
             cellBtn.dataset.index = index;
             boardEl.append(cellBtn);
         }) 
+        statusEl.textContent = lastResult.type;
     }
-    function bindEvents() {
-        boardEl.addEventListener("click", button);
-        if (e.target.tagName !== 'BUTTON') return
-        index = Number(e.target.dataset.index);
-        game.playRound(index);
-        render();
+    function bindEvents(game) {
+        resetBtn.addEventListener("click", (e) => {
+            game.resetGame();
+            render()
+        });
+        boardEl.addEventListener("click", (e) => {
+            if (e.target.tagName !== 'BUTTON') return;
+            const index = Number(e.target.dataset.index);
+            let result = game.playRound(index);
+            render();
+        });
     }
     return { render, bindEvents } }) ();
-
-
-
 
 const game = GameController();
 DisplayController.render();
