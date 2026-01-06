@@ -26,8 +26,8 @@ function Player(name, mark) {
     return { name, mark };
 }
 
-function GameController() {
-    const players = [Player('Player 1', 'X'), Player('Player 2', 'O')];
+function GameController(name1, name2) {
+    const players = [Player(name1 || "Player 1", 'X'), Player(name2 || "Player 2", 'O')];
     let currentPlayerIndex = 0;
     let gameOver = false;
 
@@ -121,6 +121,24 @@ const DisplayController = (() => {
     let statusEl = document.querySelector('#status');
     let resetBtn = document.querySelector('#reset');
     const boardEl = document.querySelector("#board");
+    const player1Input = document.querySelector("#1");
+    const player2Input = document.querySelector("#2");
+    
+    function setStatusFromGame(game) {
+        const active = game.getActivePlayer();
+        lastResult = { type: "switch", switcher: active.name }
+    }
+    function startGame() {
+        const name1 = player1Input;
+        const name2 = player2Input;
+        game = GameController(name1, name2);
+        game.resetGame();
+        setStatusFromGame();
+        isStarted = true;
+        startBtn.textContent = "Restart";
+        setStatusFromGame(game);
+        render();
+    }
     function render() {
         const board = Gameboard.getBoard();
         boardEl.textContent = '';
@@ -136,11 +154,14 @@ const DisplayController = (() => {
         }) 
         statusEl.textContent = getStatusText(lastResult);
     }
-    function bindEvents(game) {
+    function bindEvents() {
+        let game = null;
+        let isStarted = false;
+        setStatusFromGame(game);
         resetBtn.addEventListener("click", (e) => {
             game.resetGame();
-            lastResult = { type: "switch", switcher: "active.name" };
-            render()
+            setStatusFromGame(game);
+            render();
         });
         boardEl.addEventListener("click", (e) => {
             if (e.target.tagName !== 'BUTTON') return;
@@ -153,12 +174,17 @@ const DisplayController = (() => {
         if (!result || !result.type) return "";
 
         switch (result.type) {
+            case "switch":
+                boardEl.style.pointerEvents = "auto";
+                return `Turn: ${result.switcher}`;
             case "win":
+                boardEl.style.pointerEvents = "none";
                 return `Winner: ${result.winner}`;
             case "draw":
+                boardEl.style.pointerEvents = "none";
                 return "Draw!";
-            case "switch":
-                return `Turn: ${result.switcher}`;
+            case "gameOver":
+                return result.game;
             case "invalid":
                 return `Invalid: ${result.reason}`;
             default:
@@ -169,5 +195,5 @@ const DisplayController = (() => {
 
 
 const game = GameController();
-DisplayController.render();
 DisplayController.bindEvents(game);
+DisplayController.render();
