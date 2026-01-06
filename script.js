@@ -10,7 +10,7 @@ const Gameboard = (() => {
             return true;
         } else {
             return false;
-        }    
+        }
     }
     function reset() {
         for (let i = 0; i < board.length; i++) {
@@ -121,21 +121,23 @@ const DisplayController = (() => {
     let statusEl = document.querySelector('#status');
     let resetBtn = document.querySelector('#reset');
     const boardEl = document.querySelector("#board");
-    const player1Input = document.querySelector("#1");
-    const player2Input = document.querySelector("#2");
+    let game = null;
+    let isStarted = false;
+    const player1Input = document.querySelector("#player-1");
+    const player2Input = document.querySelector("#player-2");
+    
     
     function setStatusFromGame(game) {
         const active = game.getActivePlayer();
         lastResult = { type: "switch", switcher: active.name }
     }
     function startGame() {
-        const name1 = player1Input;
-        const name2 = player2Input;
+        const name1 = player1Input.value.trim();
+        const name2 = player2Input.value.trim();
         game = GameController(name1, name2);
-        game.resetGame();
-        setStatusFromGame();
+        Gameboard.reset();
         isStarted = true;
-        startBtn.textContent = "Restart";
+        resetBtn.textContent = "Restart";
         setStatusFromGame(game);
         render();
     }
@@ -155,16 +157,24 @@ const DisplayController = (() => {
         statusEl.textContent = getStatusText(lastResult);
     }
     function bindEvents() {
-        let game = null;
-        let isStarted = false;
-        setStatusFromGame(game);
+        if (!game) {
+            return "Enter names and press Start";
+        } else {
+            setStatusFromGame(game);
+        }
         resetBtn.addEventListener("click", (e) => {
+            if (!isStarted) {
+                game.startGame();
+            } else {
+                game.resetGame();
+                game.startGame();
+            }
             game.resetGame();
             setStatusFromGame(game);
             render();
         });
         boardEl.addEventListener("click", (e) => {
-            if (e.target.tagName !== 'BUTTON') return;
+            if (!isStarted || e.target.tagName !== 'BUTTON') return;
             const index = Number(e.target.dataset.index);
             lastResult = game.playRound(index);
             render();
@@ -194,6 +204,5 @@ const DisplayController = (() => {
     return { render, bindEvents } }) ();
 
 
-const game = GameController();
 DisplayController.bindEvents(game);
 DisplayController.render();
