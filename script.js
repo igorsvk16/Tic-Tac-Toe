@@ -42,14 +42,14 @@ function GameController() {
     function playRound(index) {
         if (gameOver) {
             console.log('The game is over. Please reset to start a new game.');
-            return;
+            return { type: "gameOver", game: "Game over. Press Reset"};
         }
         const player = getActivePlayer();
         const placed = Gameboard.setMark(index, player.mark);
 
         if (!placed) {
             console.log(`Invalid move`);
-            return { type: "invalid"};
+            return { type: "invalid", reason: "occupiedOrOutOfRange" };
         }
         const board = Gameboard.getBoard();
         printBoard(board);
@@ -57,16 +57,16 @@ function GameController() {
         if (winnerMark) {
             gameOver = true;
             console.log(`${player.name} with mark ${winnerMark} wins!`);
-            return { type: `${player.name} WIN!!!`};
+            return { type: "win", winner: player.name };
         }
         const isDraw = checkDraw(board);
         if (isDraw === true) {
             console.log('The game is a draw!');
-            return { type: "Draw!"};
+            return { type: "draw"};
         }
         switchPlayer();
         console.log(`It's now ${getActivePlayer().name}'s turn.`);
-        return { type: `Turn ${getActivePlayer().name}.` }
+        return { type: "switch", switcher: getActivePlayer().name }
     }
 
     const WIN_LINES = [
@@ -117,7 +117,7 @@ function GameController() {
 }
 
 const DisplayController = (() => {
-    let lastResult = game.playRound(index);
+    let lastResult = { type: "switch", switcher: "Player 1" };
     let statusEl = document.querySelector('#status');
     let resetBtn = document.querySelector('#reset');
     const boardEl = document.querySelector("#board");
@@ -134,21 +134,39 @@ const DisplayController = (() => {
             cellBtn.dataset.index = index;
             boardEl.append(cellBtn);
         }) 
-        statusEl.textContent = lastResult.type;
+        statusEl.textContent = getStatusText(lastResult);
     }
     function bindEvents(game) {
         resetBtn.addEventListener("click", (e) => {
             game.resetGame();
+            lastResult = { type: "switch", switcher: "active.name" };
             render()
         });
         boardEl.addEventListener("click", (e) => {
             if (e.target.tagName !== 'BUTTON') return;
             const index = Number(e.target.dataset.index);
-            let result = game.playRound(index);
+            lastResult = game.playRound(index);
             render();
         });
     }
+    function getStatusText(result) {
+        if (!result || !result.type) return "";
+
+        switch (result.type) {
+            case "win":
+                return `Winner: ${result.winner}`;
+            case "draw":
+                return "Draw!";
+            case "switch":
+                return `Turn: ${result.switcher}`;
+            case "invalid":
+                return `Invalid: ${result.reason}`;
+            default:
+                return String(result.type);
+        }
+    }
     return { render, bindEvents } }) ();
+
 
 const game = GameController();
 DisplayController.render();
