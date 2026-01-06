@@ -3,17 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Tic-Tac-Toe</title>
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
 </head>
 <body>
-    <div id="setup">
-        <input type="text" id="player-1">
-        <input type="text" id="player-2">
-    </div>
-    <div id="board"></div>
-    <div id="status"></div>
-    <button id="start">Start</button>
+    <main class="app">
+        <header class="hero">
+            <p class="eyebrow">Classic</p>
+            <h1>Tic-Tac-Toe</h1>
+            <p class="subtitle">Pick names, then tap a square to claim it.</p>
+        </header>
+
+        <section class="panel">
+            <div id="setup" class="setup">
+                <label class="field">
+                    <span>Player 1</span>
+                    <input type="text" id="player-1" placeholder="First player">
+                </label>
+                <label class="field">
+                    <span>Player 2</span>
+                    <input type="text" id="player-2" placeholder="Second player">
+                </label>
+                <button id="start" class="primary">Start</button>
+            </div>
+
+            <div class="game">
+                <div id="board" aria-label="Game board"></div>
+                <div id="status" class="status"></div>
+            </div>
+        </section>
+    </main>
 </body>
 </html>
