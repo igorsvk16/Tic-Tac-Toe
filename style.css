@@ -122,6 +122,12 @@ input[type="text"]:focus {
     box-shadow: 0 0 0 3px rgba(30, 167, 161, 0.18);
 }
 
+input[type="text"].winner {
+    background: rgba(46, 204, 113, 0.18);
+    border-color: rgba(46, 204, 113, 0.6);
+    box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.2);
+}
+
 .primary,
 #start {
     padding: 12px 22px;
@@ -179,6 +185,11 @@ input[type="text"]:focus {
     justify-content: center;
     cursor: pointer;
     transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+#board button.win-cell {
+    text-decoration: line-through;
+    text-decoration-thickness: 3px;
 }
 
 #board button:hover {

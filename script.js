@@ -1,4 +1,4 @@
-const Gameboard = (() => {
+﻿const Gameboard = (() => {
     const board = Array(9).fill(null);
 
     function getBoard() {
@@ -52,11 +52,11 @@ function GameController(name1, name2) {
         }
         const board = Gameboard.getBoard();
         printBoard(board);
-        const winnerMark = checkWinner(board);
-        if (winnerMark) {
+        const winningLine = checkWinner(board);
+        if (winningLine) {
             gameOver = true;
-            console.log(`${player.name} with mark ${winnerMark} wins!`);
-            return { type: "win", winner: player.name };
+            console.log(`${player.name} with mark ${player.mark} wins!`);
+            return { type: "win", winner: player.name, line: winningLine };
         }
         const isDraw = checkDraw(board);
         if (isDraw === true) {
@@ -83,7 +83,7 @@ function GameController(name1, name2) {
         for (const line of WIN_LINES) {
             const [a, b, c] = line;
             if (board[a] !== null && board[a] === board[b] && board[a] === board[c]) {
-                return board[a];
+                return line;
             }
         }
         return null;
@@ -125,8 +125,10 @@ const DisplayController = (() => {
         }       
     }
     function startGame() {
-        const name1 = player1Input.value.trim();
-        const name2 = player2Input.value.trim();
+        const name1 = player1Input.value.trim() || "Player 1";
+        const name2 = player2Input.value.trim() || "Player 2";
+        player1Input.value = name1;
+        player2Input.value = name2;
         game = GameController(name1, name2);
         Gameboard.reset();
         isStarted = true;
@@ -136,6 +138,7 @@ const DisplayController = (() => {
     }
     function render() {
         const board = Gameboard.getBoard();
+        const winningLine = lastResult && lastResult.type === "win" ? lastResult.line : null;
         boardEl.textContent = '';
         board.forEach((value, index) => {
             const cellBtn = document.createElement("button")
@@ -144,10 +147,14 @@ const DisplayController = (() => {
             } else {
                 cellBtn.textContent = value;
             }
+            if (winningLine && winningLine.includes(index)) {
+                cellBtn.classList.add("win-cell");
+            }
             cellBtn.dataset.index = index;
             boardEl.append(cellBtn);
         }) 
         statusEl.textContent = getStatusText(lastResult);
+        updateWinnerHighlight(lastResult); 
     }
     function bindEvents() {
         if (!game) {
@@ -165,6 +172,19 @@ const DisplayController = (() => {
             lastResult = game.playRound(index);
             render();
         });
+    }
+    function updateWinnerHighlight(result) {
+        player1Input.classList.remove("winner");
+        player2Input.classList.remove("winner");
+        if (!result || result.type !== "win") return;
+
+        if (player1Input.value.trim() === result.winner) {
+            player1Input.classList.add("winner");
+        }
+        if (player2Input.value.trim() === result.winner) {
+            player2Input.classList.add("winner");
+        }
+
     }
     function getStatusText(result) {
         if (!result || !result.type) return "";
