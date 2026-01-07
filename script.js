@@ -155,6 +155,23 @@ const DisplayController = (() => {
         }) 
         statusEl.textContent = getStatusText(lastResult);
         updateWinnerHighlight(lastResult); 
+        updateActiveHighlight();
+    }
+    function updateActiveHighlight() {
+        player1Input.classList.remove("active");
+        player2Input.classList.remove("active");
+        if (!game || !isStarted) return;
+        if (lastResult && (lastResult.type === "win" || lastResult.type === "draw" || lastResult.type === "gameOver")) {
+            return;
+        }
+
+        const activeName = game.getActivePlayer().name;
+        if (player1Input.value.trim() === activeName) {
+            player1Input.classList.add("active");
+        }
+        if (player2Input.value.trim() === activeName) {
+            player2Input.classList.add("active");
+        }
     }
     function bindEvents() {
         if (!game) {

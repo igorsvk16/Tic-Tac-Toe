@@ -122,6 +122,12 @@ input[type="text"]:focus {
     box-shadow: 0 0 0 3px rgba(30, 167, 161, 0.18);
 }
 
+input[type="text"].active {
+    background: rgba(30, 167, 161, 0.16);
+    border-color: rgba(30, 167, 161, 0.5);
+    box-shadow: 0 0 0 3px rgba(30, 167, 161, 0.18);
+}
+
 input[type="text"].winner {
     background: rgba(46, 204, 113, 0.18);
     border-color: rgba(46, 204, 113, 0.6);
